@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact, deleteContact, setFilter } from '../redux/contactSlice';
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
-import localStorageService from './LocalStorage/LocalStorage';
 
 const App = () => {
-  const [contacts, setContacts] = useState(localStorageService.getContacts());
-  const [filter, setFilter] = useState('');
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const contacts = useSelector(state => state.contacts);
+  const filter = useSelector(state => state.filter);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    localStorageService.saveContacts(contacts);
-  }, [contacts]);
+  useEffect(() => {}, []);
 
   const handleAddContact = newContact => {
     const isDuplicate = contacts.some(
@@ -21,34 +19,23 @@ const App = () => {
     if (isDuplicate) {
       alert(`Contact with name '${newContact.name}' already exists!`);
     } else {
-      setContacts(prevContacts => [
-        ...prevContacts,
-        { ...newContact, id: `id-${prevContacts.length + 1}` },
-      ]);
+      dispatch(addContact(newContact));
     }
   };
 
   const handleFilterChange = event => {
-    setFilter(event.target.value);
+    dispatch(setFilter(event.target.value));
   };
 
   const handleDeleteContact = contactId => {
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== contactId)
-    );
+    dispatch(deleteContact(contactId));
   };
 
   return (
     <div>
       <h1>My Phonebook</h1>
       <div className="addformula">
-        <ContactForm
-          onAddContact={handleAddContact}
-          name={name}
-          number={number}
-          setName={setName}
-          setNumber={setNumber}
-        />
+        <ContactForm onAddContact={handleAddContact} />
         <label className="filterinput">
           <span className="filtername">Filter by Name:</span>
           <input
@@ -62,11 +49,7 @@ const App = () => {
       </div>
 
       <h2>Contacts:</h2>
-      <ContactList
-        contacts={contacts}
-        filter={filter}
-        onDeleteContact={handleDeleteContact}
-      />
+      <ContactList onDeleteContact={handleDeleteContact} />
     </div>
   );
 };

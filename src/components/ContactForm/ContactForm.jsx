@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { nanoid } from 'nanoid';
+import { useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contactSlice';
 import css from './ContactForm.module.css';
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: '',
     number: '',
@@ -17,12 +19,11 @@ const ContactForm = ({ onAddContact }) => {
     event.preventDefault();
 
     const newContact = {
-      id: nanoid(),
       name: formData.name.trim(),
       number: formData.number.trim(),
     };
 
-    onAddContact(newContact);
+    dispatch(addContact(newContact));
     setFormData({ name: '', number: '' });
   };
 
